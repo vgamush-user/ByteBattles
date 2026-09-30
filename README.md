@@ -16,7 +16,7 @@ The system is designed to be practical, fast, and scalable on a single machine w
 - Pre-warmed Docker sandbox pools for low-latency execution
 - PostgreSQL for persistent metadata
 - MinIO object storage for testcase and submission artifacts
-- Isolated execution for C, C++, and Python
+- Isolated execution for C, C++, Python, and Java
 - Automated verdict generation with CPU and memory limits
 - Sandbox Manager to manage the pre-warmed container pool (multi threaded)
 
@@ -88,7 +88,7 @@ The judge system handles:
 ### Judge execution
 - Managed by Judge Orchestrator
 - Spawns/Kills Judge Workers automatically depending on current load
-- Supports C, C++, and Python
+- Supports C, C++, Python, and Java
 - Uses prebuilt language-specific Docker images
 - Enforces execution limits
 - Compares program output against testcase output
@@ -144,6 +144,8 @@ ByteBattles/
     ├── images
     │   ├── build_command.sh
     │   ├── gcc
+    │   │   └── Dockerfile
+    │   ├── java
     │   │   └── Dockerfile
     │   └── python
     │       └── Dockerfile
@@ -298,6 +300,7 @@ The judge uses language-specific Docker images:
 
 - `judge-gcc` for C and C++
 - `judge-python` for Python
+- `judge-java` for Java
 
 These images are kept minimal to reduce startup overhead and improve sandbox pool efficiency.
 

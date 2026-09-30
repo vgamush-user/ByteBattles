@@ -102,8 +102,16 @@ class JudgePipeline:
 
             elif language == Language.PYTHON:
                 executable_path = f"{WORKSPACE_DIR}/main.py"
+
+            elif language == Language.JAVA:
+                compile_result = self.executor.compile_java(container)
+                if not compile_result.ok:
+                    result.verdict = Verdict.COMPILATION_ERROR
+                    result.output = compile_result.output
+                executable_path = "Main"
             else:
                 raise ValueError(f"Unsupported language: {language}")
+
             
             if result.verdict == Verdict.PENDING:
                 final_verdict = Verdict.ACCEPTED

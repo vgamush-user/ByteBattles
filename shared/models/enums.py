@@ -23,3 +23,5 @@ class Language(str, Enum):
     C = "C"
     CPP = "CPP"
     PYTHON = "PY"
+    JAVA = "JAVA"
+

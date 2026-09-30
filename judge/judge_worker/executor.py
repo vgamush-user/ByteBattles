@@ -54,6 +54,24 @@ class JudgeExecutor:
             exit_code=exit_code,
         )
 
+    def compile_java(self, container) -> CompileResult:
+        cmd = [
+            "/bin/sh",
+            "-lc",
+            f"timeout -s KILL 10s javac -d {WORKSPACE_DIR} {WORKSPACE_DIR}/Main.java 2>&1",
+        ]
+        result = self._container_exec(container, cmd)
+        exit_code = int(result.exit_code)
+
+        stdout_b, stderr_b = result.output if isinstance(result.output, tuple) else (b"", b"")
+        out = (stdout_b or b"").decode(errors="replace") + (stderr_b or b"").decode(errors="replace")
+
+        return CompileResult(
+            ok=exit_code == 0,
+            output=out,
+            exit_code=exit_code,
+        )
+
     def run_program(
         self,
         container,
@@ -72,8 +90,11 @@ class JudgeExecutor:
             inner_cmd = f"{executable_path}"
         elif language == Language.PYTHON:
             inner_cmd = f"python3 {executable_path}"
+        elif language == Language.JAVA:
+            inner_cmd = f"java -cp {self.workspace_dir} {executable_path}"
         else:
             raise ValueError(f"Unsupported language: {language}")
+
 
         cmd = [
             "/bin/sh",

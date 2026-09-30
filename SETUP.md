@@ -29,7 +29,8 @@ docker volume create bytebattles_minio
 
 ## 3. Build the sandbox images
 
-The judge leases containers from `judge-gcc` and `judge-python` images. Build them once (and again any time you touch `judge/images/*`):
+The judge leases containers from `judge-gcc`, `judge-python`, and `judge-java` images. Build them once (and again any time you touch `judge/images/*`):
+
 
 ```bash
 cd judge/images
