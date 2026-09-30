@@ -58,7 +58,7 @@ class JudgeExecutor:
         cmd = [
             "/bin/sh",
             "-lc",
-            f"timeout -s KILL 10s javac -d {WORKSPACE_DIR} {WORKSPACE_DIR}/Main.java 2>&1",
+            f"timeout -s KILL 10s /opt/java/openjdk/bin/javac -d {WORKSPACE_DIR} {WORKSPACE_DIR}/Main.java 2>&1",
         ]
         result = self._container_exec(container, cmd)
         exit_code = int(result.exit_code)
@@ -91,7 +91,7 @@ class JudgeExecutor:
         elif language == Language.PYTHON:
             inner_cmd = f"python3 {executable_path}"
         elif language == Language.JAVA:
-            inner_cmd = f"java -cp {self.workspace_dir} {executable_path}"
+            inner_cmd = f"/opt/java/openjdk/bin/java -cp {self.workspace_dir} {executable_path}"
         else:
             raise ValueError(f"Unsupported language: {language}")
 

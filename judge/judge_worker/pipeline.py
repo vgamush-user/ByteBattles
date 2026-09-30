@@ -65,17 +65,17 @@ class JudgePipeline:
         with self.db.session() as db:
             submission = self._get_submission(db, submission_id)
             problem_id = submission.problem_id
-            language = submission.language.value
+            language = submission.language
             testcases = self._get_testcases(db, problem_id)
             time_limit_sec, memory_limit_kb = self._get_time_mem_limit(db, problem_id)
 
-        container_id = self.queues.acquire_warm_sandbox(language, timeout=ACQUIRE_TIMEOUT_SECONDS)
+        container_id = self.queues.acquire_warm_sandbox(language.value, timeout=ACQUIRE_TIMEOUT_SECONDS)
         if container_id is None:
             raise TimeoutError(f"No warm sandbox available for {language}")
         
         self.queues.publish_event({
             "submission_id": submission_id,
-            "language": language,
+            "language": language.value,
         })
 
         container = None
