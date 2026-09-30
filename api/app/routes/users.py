@@ -65,5 +65,6 @@ def get_user(username: str, db: Session = Depends(get_db), current_user: User | 
     
     return UserResponseUnknown(
         username=user.username,
+        is_verified=user.is_verified,
         created_at=user.created_at
     )

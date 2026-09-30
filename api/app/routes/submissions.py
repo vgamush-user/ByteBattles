@@ -91,7 +91,7 @@ def get_submissions(problem_id: str | None = None, username: str | None = None, 
     return submissions
 
 @router.get('/{submission_id}', status_code=status.HTTP_200_OK, response_model=SubmissionResponse)
-def get_submission_by_id(submission_id: int | None, db: Session = Depends(get_db)):
+def get_submission_by_id(submission_id: int, db: Session = Depends(get_db)):
 
     submission = db.query(Submission).filter(Submission.id == submission_id).first()
     if not submission or submission.problem.visibility == False:

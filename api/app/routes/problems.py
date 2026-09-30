@@ -30,7 +30,7 @@ router = APIRouter(
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=List[ProblemResponse])
 def get_problems(page: int = Query(default=1, ge=1), limit: int = Query(default=20, ge=5, le=100), db: Session = Depends(get_db), current_user: User | None = Depends(oauth2.get_optional_current_admin)):
-    offset = page * limit
+    offset = (page - 1) * limit
     if current_user:
         problems = db.query(Problem).order_by(Problem.id.asc()).offset(offset).limit(limit).all()
     else:
@@ -147,7 +147,7 @@ async def create_problem(
         raise HTTPException(detail="Mismatch between input and output files", status_code=status.HTTP_400_BAD_REQUEST)
     
     for input_file, output_file in zip(input_files, output_files):
-        if input_file.split("/")[-1] != output_file.split("/")[-1]:
+        if input_file.split("/")[-1].split(".")[0] != output_file.split("/")[-1].split(".")[0]:
             zip_file.close()
             raise HTTPException(detail="Mismatch in input and output file name. Each input file should have a corespoinding output file", status_code=status.HTTP_400_BAD_REQUEST)
     
@@ -237,7 +237,7 @@ async def create_problem(
         "testcases": len(input_files)
     }
 
-@router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{problem_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_problem(problem_id: str, current_user: User = Depends(oauth2.get_current_admin), db: Session = Depends(get_db)):
     problem = db.query(Problem).filter(Problem.id == problem_id).first()
     if not problem:
