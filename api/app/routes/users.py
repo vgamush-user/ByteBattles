@@ -2,15 +2,16 @@ from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..utils import oauth2, password_manager
-from ..schemas.user import UserResponse, UserUpdate, UserResponseUnknown
+from ..schemas.user import UserResponse, UserUpdate, UserResponseUnknown, RoleUpdate
 from ..database import get_db
 
-from shared.models import User
+from shared.models import User, UserType
 
 router = APIRouter(
     prefix='/users',
     tags=["Users"]
 )
+
 
 @router.get('/me', status_code=status.HTTP_200_OK, response_model=UserResponse)
 def get_current_user(current_user: User = Depends(oauth2.get_current_user)):
@@ -67,3 +68,25 @@ def get_user(username: str, db: Session = Depends(get_db), current_user: User | 
         username=user.username,
         created_at=user.created_at
     )
+
+@router.patch('/{username}/promote', status_code=status.HTTP_200_OK, response_model=UserResponse)
+def promote_user(username: str, current_admin: User = Depends(oauth2.get_current_admin), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(detail="User with the given username was not found", status_code=status.HTTP_404_NOT_FOUND)
+    
+    user.user_type = UserType.ADMIN
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.patch('/{username}/role', status_code=status.HTTP_200_OK, response_model=UserResponse)
+def update_user_role(username: str, role_data: RoleUpdate, current_admin: User = Depends(oauth2.get_current_admin), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(detail="User with the given username was not found", status_code=status.HTTP_404_NOT_FOUND)
+    
+    user.user_type = role_data.user_type
+    db.commit()
+    db.refresh(user)
+    return user

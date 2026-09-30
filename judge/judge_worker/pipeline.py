@@ -60,6 +60,13 @@ class JudgePipeline:
             submission.walltime_ms = result.runtime_ms
             submission.memory_kb = result.memory_kb
 
+            problem = db.query(Problem).filter(Problem.id == submission.problem_id).first()
+            if problem is not None:
+                problem.total_submissions = (problem.total_submissions or 0) + 1
+                if result.verdict == Verdict.ACCEPTED:
+                    problem.accepted_submissions = (problem.accepted_submissions or 0) + 1
+
+
     def process_submission(self, submission_id: int) -> SubmissionResult:
 
         with self.db.session() as db:

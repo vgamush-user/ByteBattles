@@ -58,6 +58,8 @@ class UserUpdate(BaseModel):
             )
         return v
 
+from shared.models import UserType
+
 class UserResponseUnknown(BaseModel):
     username: str
     is_verified: bool
@@ -72,14 +74,18 @@ class UserResponse(BaseModel):
     username: str
     email: EmailStr
     is_verified: bool
+    user_type: UserType = UserType.USER
     created_at: datetime
 
     model_config = {
       "from_attributes": True
     }
 
+class RoleUpdate(BaseModel):
+    user_type: UserType
+
 class TokenPayload(BaseModel):
     sub: int
 
 class RefreshAccessTokenRequest(BaseModel):
-    refresh_token: str
+    refresh_token: str
